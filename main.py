@@ -2,6 +2,7 @@ import sys
 import sqlite3
 
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
 from PyQt5 import uic
 
 WRONG_QUERY = 'Чуть не сделали неправильный запрос!'
@@ -81,10 +82,13 @@ class Example(QWidget):
         if len(rows) == 1:
             self.table.selectRow(*rows)
             row = [i.text() for i in self.table.selectedItems()]
+
             subtitle = f'Вы действительно хотите \nудалить кофе "{row[1]}"?'
-            dialog = UserConfirmationDialog(self, 'Подтверждение удаления', subtitle)
-            dialog.exec()
-            if dialog.accepted:
+            dialog = QMessageBox(QMessageBox.Question, 'Подтверждение удаления', subtitle, QMessageBox.Yes |
+                                 QMessageBox.No, self)
+            ok = dialog.exec()
+
+            if ok == QMessageBox.Yes:
                 que = f'''DELETE FROM coffee WHERE id = {row[0]}'''
                 self.cur.execute(que)
                 self.con.commit()
